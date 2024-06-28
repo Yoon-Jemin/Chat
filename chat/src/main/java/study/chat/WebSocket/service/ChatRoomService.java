@@ -1,0 +1,51 @@
+package study.chat.WebSocket.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import study.chat.WebSocket.domain.ChatRoom;
+import study.chat.WebSocket.domain.repository.ChatRoomRepository;
+
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class ChatRoomService {
+
+    private final ChatRoomRepository chatRoomRepository;
+
+    public Optional<String> getChatRoomId(
+            String senderId,
+            String recipientId,
+            boolean createNewRoomIfNotExists
+    ){
+        return chatRoomRepository.findBySenderIdAndRecipientId(senderId, recipientId)
+                .map(ChatRoom::getChatId)
+                .or(() -> {
+                    if(createNewRoomIfNotExists){
+                        String chatId = createChatId(senderId, recipientId);
+                        return Optional.of(chatId);
+                    }
+                    return Optional.empty();
+                });
+    }
+
+    private String createChatId(String senderId, String recipientId) {
+        String chatId = String.format("%s_%s", senderId, recipientId);    // jemin_dongmin
+
+        ChatRoom senderRecepient = ChatRoom.builder()
+                .chatId(chatId)
+                .senderId(senderId)
+                .recipientId(recipientId)
+                .build();
+
+        ChatRoom recepientSender = ChatRoom.builder()
+                .chatId(chatId)
+                .senderId(recipientId)
+                .recipientId(senderId)
+                .build();
+
+        chatRoomRepository.save(senderRecepient);
+        chatRoomRepository.save(recepientSender);
+        return chatId;
+    }
+}

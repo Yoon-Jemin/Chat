@@ -7,9 +7,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ChatMessage {
+public class ChatNotification {
 
+    private String id;
+    private String senderId;
+    private String recipientId;
     private String content;
-    private String sender;
-    private MessageType type;
 }
