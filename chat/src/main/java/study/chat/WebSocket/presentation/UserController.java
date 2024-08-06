@@ -19,14 +19,14 @@ public class UserController {
     private final UserService userService;
 
     @MessageMapping("/user.addUser")
-    @SendTo("/user/topic")  // 알림 등을 보내기 위한 큐
+    @SendTo("/user/public")  // 알림 등을 보내기 위한 큐
     public User addUser(@Payload User user){
         userService.saveUser(user);
         return user;
     }
 
     @MessageMapping("/user.disconnectUser")
-    @SendTo("/user/topic")
+    @SendTo("/user/public")
     public User disconnect(@Payload User user){
         userService.disconnect(user);
         return user;
@@ -36,4 +36,5 @@ public class UserController {
     public ResponseEntity<List<User>> findConnectedUsers(){
         return ResponseEntity.ok(userService.findConnectedUsers());
     }
+
 }
